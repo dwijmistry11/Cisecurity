@@ -1130,17 +1130,17 @@ lev && UFW && (install_package ufw)
 NO=3.5.1.2;   W=1; S=1; E=; SC=;  BD='Ensure iptables-persistent is not installed with ufw'
 lev && UFW && (remove_package iptables-persistent)
 
-NO=3.5.1.3;   W=1; S=1; E=; SC=;  BD='Ensure ufw service is enabled'
-lev && UFW && (
-    (ufw status | grep -qwi "active") || (
-        upd || prw "UFW firewall needs to be enabled."
-        upd && prw "Enabling UFW firewall."
-        upd && ufw enable
-        err || prn "UFW: Firewall is enabled." 
-    )
-    ip6 && (update_conf /etc/default/ufw 'IPV6' 'IPV6=yes')
-    ip6 || (update_conf /etc/default/ufw 'IPV6' 'IPV6=no')
-)
+# NO=3.5.1.3;   W=1; S=1; E=; SC=;  BD='Ensure ufw service is enabled'
+# lev && UFW && (
+#     (ufw status | grep -qwi "active") || (
+#         upd || prw "UFW firewall needs to be enabled."
+#         upd && prw "Enabling UFW firewall."
+#         upd && ufw enable
+#         err || prn "UFW: Firewall is enabled." 
+#     )
+#     ip6 && (update_conf /etc/default/ufw 'IPV6' 'IPV6=yes')
+#     ip6 || (update_conf /etc/default/ufw 'IPV6' 'IPV6=no')
+# )
 
 NO=3.5.1.4;   W=1; S=1; E=; SC=;  BD='Ensure loopback traffic is configured'
 lev && UFW && (
@@ -1164,40 +1164,40 @@ lev && UFW && (
     upd && ufw allow out git
 )
 
-NO=3.5.1.6;   W=1; S=1; E=; SC=N; BD='Ensure firewall rules exist for all open ports'
-lev && UFW && (
-    # tcp
-    while read PORT; do
-        ufw status | grep "^${PORT}" | grep -q tcp
-        case $? in
-            0)  prn "UFW: TCP Port ${PORT} is already open." ;;
-            *)  upd || prn "UFW: Port ${PORT} might need to be opened."
-                upd && prw "UFW: Opening port ${PORT}."
-                case ${PORT} in 
-                    22) upd && ufw allow proto tcp from ${INTNETWORK} to any port ${PORT} ;;
-                    *)  upd && ufw allow proto tcp to any port ${PORT} ;;
-                esac ;;
-        esac
-    done < <(netstat -tnlp | grep "^tcp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
-    # udp
-    while read PORT; do
-        ufw status | grep "^${PORT}" | grep -q udp
-        case $? in
-            0)  prn "UFW: UDP Port ${PORT} is already open." ;;
-            *)  upd || prn "UFW: Port ${PORT} might need to be opened."
-                upd && prw "UFW: Opening port ${PORT}."
-                upd && ufw allow proto udp to any port ${PORT} ;;
-        esac
-    done < <(netstat -tnlp | grep "^udp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
-)
+# NO=3.5.1.6;   W=1; S=1; E=; SC=N; BD='Ensure firewall rules exist for all open ports'
+# lev && UFW && (
+#     # tcp
+#     while read PORT; do
+#         ufw status | grep "^${PORT}" | grep -q tcp
+#         case $? in
+#             0)  prn "UFW: TCP Port ${PORT} is already open." ;;
+#             *)  upd || prn "UFW: Port ${PORT} might need to be opened."
+#                 upd && prw "UFW: Opening port ${PORT}."
+#                 case ${PORT} in 
+#                     22) upd && ufw allow proto tcp from ${INTNETWORK} to any port ${PORT} ;;
+#                     *)  upd && ufw allow proto tcp to any port ${PORT} ;;
+#                 esac ;;
+#         esac
+#     done < <(netstat -tnlp | grep "^tcp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
+#     # udp
+#     while read PORT; do
+#         ufw status | grep "^${PORT}" | grep -q udp
+#         case $? in
+#             0)  prn "UFW: UDP Port ${PORT} is already open." ;;
+#             *)  upd || prn "UFW: Port ${PORT} might need to be opened."
+#                 upd && prw "UFW: Opening port ${PORT}."
+#                 upd && ufw allow proto udp to any port ${PORT} ;;
+#         esac
+#     done < <(netstat -tnlp | grep "^udp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
+# )
 
-NO=3.5.1.7;   W=1; S=1; E=; SC=;  BD='Ensure default deny firewall policy'
-lev && UFW && (
-    upd && ufw default deny incoming
-    upd && ufw default deny outgoing
-    #upd && ufw default allow outgoing
-    upd && ufw default deny routed
-)
+# NO=3.5.1.7;   W=1; S=1; E=; SC=;  BD='Ensure default deny firewall policy'
+# lev && UFW && (
+#     upd && ufw default deny incoming
+#     upd && ufw default deny outgoing
+#     #upd && ufw default allow outgoing
+#     upd && ufw default deny routed
+# )
 
 NO=3.5.2.1;   W=1; S=1; E=; SC=;  BD='Ensure nftables is installed'
 lev && nft && (install_package nftables) 
@@ -1240,15 +1240,15 @@ lev && nft && (
     upd && nft add rule inet filter output ip protocol icmp ct state new,related,established accept
 )
 
-NO=3.5.2.8;   W=1; S=1; E=; SC=;  BD='Ensure nftables default deny firewall policy'
-lev && nft && (
-    upd || prn "Nftables: Default deny firewall policy might need to be configured."
-    upd && prn "Nftables: Configuring default deny firewall policy."
-    upd && ssd && nft add rule inet incoming-traffic management tcp dport 22
-    upd && nft chain inet filter input { policy drop \; }
-    upd && nft chain inet filter forward { policy drop \; }
-    upd && nft chain inet filter output { policy drop \; }
-)
+# NO=3.5.2.8;   W=1; S=1; E=; SC=;  BD='Ensure nftables default deny firewall policy'
+# lev && nft && (
+#     upd || prn "Nftables: Default deny firewall policy might need to be configured."
+#     upd && prn "Nftables: Configuring default deny firewall policy."
+#     upd && ssd && nft add rule inet incoming-traffic management tcp dport 22
+#     upd && nft chain inet filter input { policy drop \; }
+#     upd && nft chain inet filter forward { policy drop \; }
+#     upd && nft chain inet filter output { policy drop \; }
+# )
 
 NO=3.5.2.9;   W=1; S=1; E=; SC=;  BD='Ensure nftables service is enabled'
 lev && nft && upd && (systemctl enable nftables)
@@ -1291,46 +1291,46 @@ lev && ipt && (
     upd && iptables-save -c > /etc/iptables.rules
 )
 
-NO=3.5.3.2.3; W=1; S=1; E=; SC=;  BD='Ensure iptables default deny firewall policy'
-lev && ipt && (
-    upd || prn "Iptables. Default deny firewall policy might need to be configured."
-    upd && prn "Iptables. Configuring default deny firewall policy."
-    upd && iptables -P INPUT   DROP
-    upd && iptables -P OUTPUT  DROP
-    upd && iptables -P FORWARD DROP
-    upd && iptables-save -c > /etc/iptables.rules
-)
+# NO=3.5.3.2.3; W=1; S=1; E=; SC=;  BD='Ensure iptables default deny firewall policy'
+# lev && ipt && (
+#     upd || prn "Iptables. Default deny firewall policy might need to be configured."
+#     upd && prn "Iptables. Configuring default deny firewall policy."
+#     upd && iptables -P INPUT   DROP
+#     upd && iptables -P OUTPUT  DROP
+#     upd && iptables -P FORWARD DROP
+#     upd && iptables-save -c > /etc/iptables.rules
+# )
 
-NO=3.5.3.2.4; W=1; S=1; E=; SC=;  BD='Ensure iptables firewall rules exist for all open ports'
-lev && ipt && (
-    upd || prn "Iptables. Firewall rules for all open ports might need to be configured."
-    upd && prn "Iptables. Configuring firewall rules for all open ports."
-# tcp
-    while read PORT; do
-        iptables -nL | grep ${PORT} | grep -q tcp 
-        case $? in
-            0)  prn "TCP Port ${PORT} is already open in iptables." ;;
-            *)  upd || prn "Iptables: Port ${PORT} might need to be opened."
-                upd && prw "Iptables: Opening port ${PORT} ."
-                case ${PORT} in 
-                    22) upd && iptables -A INPUT --source ${INTNETWORK} -p tcp --dport 22 -m state --state NEW -j ACCEPT ;;
-                    *)  upd && iptables -A INPUT -p tcp --dport ${PORT} -m state --state NEW -j ACCEPT ;;
-                esac ;;
-        esac
-    done < <(netstat -tnlp | grep "^tcp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
-# udp
-    while read PORT; do
-        iptables -nL | grep ${PORT} | grep -q udp 
-        case $? in
-            0)  prn "UDP Port ${PORT} is already open in iptables." ;;
-            *)  upd || prn "Iptables: Port ${PORT} might need to be opened."
-                upd && prw "Iptables: Opening port ${PORT} ."
-                upd && iptables -A INPUT -p udp --dport ${PORT} -m state --state NEW -j ACCEPT ;;
-        esac
-    done < <(netstat -tnlp | grep "^udp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
-    upd && iptables -A INPUT -j DROP
-    upd && iptables-save -c > /etc/iptables.rules
-)
+# NO=3.5.3.2.4; W=1; S=1; E=; SC=;  BD='Ensure iptables firewall rules exist for all open ports'
+# lev && ipt && (
+#     upd || prn "Iptables. Firewall rules for all open ports might need to be configured."
+#     upd && prn "Iptables. Configuring firewall rules for all open ports."
+# # tcp
+#     while read PORT; do
+#         iptables -nL | grep ${PORT} | grep -q tcp 
+#         case $? in
+#             0)  prn "TCP Port ${PORT} is already open in iptables." ;;
+#             *)  upd || prn "Iptables: Port ${PORT} might need to be opened."
+#                 upd && prw "Iptables: Opening port ${PORT} ."
+#                 case ${PORT} in 
+#                     22) upd && iptables -A INPUT --source ${INTNETWORK} -p tcp --dport 22 -m state --state NEW -j ACCEPT ;;
+#                     *)  upd && iptables -A INPUT -p tcp --dport ${PORT} -m state --state NEW -j ACCEPT ;;
+#                 esac ;;
+#         esac
+#     done < <(netstat -tnlp | grep "^tcp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
+# # udp
+#     while read PORT; do
+#         iptables -nL | grep ${PORT} | grep -q udp 
+#         case $? in
+#             0)  prn "UDP Port ${PORT} is already open in iptables." ;;
+#             *)  upd || prn "Iptables: Port ${PORT} might need to be opened."
+#                 upd && prw "Iptables: Opening port ${PORT} ."
+#                 upd && iptables -A INPUT -p udp --dport ${PORT} -m state --state NEW -j ACCEPT ;;
+#         esac
+#     done < <(netstat -tnlp | grep "^udp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
+#     upd && iptables -A INPUT -j DROP
+#     upd && iptables-save -c > /etc/iptables.rules
+# )
 
 NO=3.5.3.3.1; W=1; S=1; E=; SC=;  BD='Ensure ip6tables loopback traffic is configured'
 lev && ipt && ip6 &&  (
@@ -1355,46 +1355,46 @@ lev && ipt && ip6 && (
     upd && iptables-save -c > /etc/iptables.rules
 )
 
-NO=3.5.3.3.3; W=1; S=1; E=; SC=;  BD='Ensure ip6tables default deny firewall policy'
-lev && ipt && ip6 && (
-    upd || prn "Ip6tables. Default deny firewall might need to be configured."
-    upd && prn "Ip6tables. Configuring default deny firewall policy."
-    upd && ip6tables -P INPUT DROP
-    upd && ip6tables -P OUTPUT DROP
-    upd && ip6tables -P FORWARD DROP
-    upd && iptables-save -c > /etc/iptables.rules
-)
+# NO=3.5.3.3.3; W=1; S=1; E=; SC=;  BD='Ensure ip6tables default deny firewall policy'
+# lev && ipt && ip6 && (
+#     upd || prn "Ip6tables. Default deny firewall might need to be configured."
+#     upd && prn "Ip6tables. Configuring default deny firewall policy."
+#     upd && ip6tables -P INPUT DROP
+#     upd && ip6tables -P OUTPUT DROP
+#     upd && ip6tables -P FORWARD DROP
+#     upd && iptables-save -c > /etc/iptables.rules
+# )
 
-NO=3.5.3.3.4; W=1; S=1; E=; SC=N; BD='Ensure ip6tables firewall rules exist for all open ports'
-lev && ipt && ip6 && (
-    upd || prn "ip6tables. Firewall rules for all open ports might need to be configured."
-    upd && prn "ip6tables. Configuring firewall rules for all open ports."
-# tcp
-    while read PORT; do
-        ip6tables -nL | grep ${PORT} | grep -q tcp
-        case $? in
-            0)  prn "TCP Port ${PORT} is already open in ip6tables." ;;
-            *)  upd || prn "ip6tables: Port ${PORT} might need to be opened."
-                upd && prw "ip6tables: Opening port ${PORT} ."
-                case ${PORT} in
-                    22) upd && ip6tables -A INPUT --source ${INTNETWORK} -p tcp --dport 22 -m state --state NEW -j ACCEPT ;;
-                    *)  upd && ip6tables -A INPUT -p tcp --dport ${PORT} -m state --state NEW -j ACCEPT ;;
-                esac ;;
-        esac
-    done < <(netstat -tnlp | grep "^tcp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
-# udp
-    while read PORT; do
-        ip6tables -nL | grep ${PORT} | grep -q udp
-        case $? in
-            0)  prn "UDP Port ${PORT} is already open in ip6tables." ;;
-            *)  upd || prn "ip6tables: Port ${PORT} might need to be opened."
-                upd && prw "ip6tables: Opening port ${PORT}."
-                upd && ip6tables -A INPUT -p udp --dport ${PORT} -m state --state NEW -j ACCEPT ;;
-        esac
-    done < <(netstat -tnlp | grep "^udp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
-    upd && ip6tables -A INPUT -j DROP
-    upd && iptables-save -c > /etc/iptables.rules
-)
+# NO=3.5.3.3.4; W=1; S=1; E=; SC=N; BD='Ensure ip6tables firewall rules exist for all open ports'
+# lev && ipt && ip6 && (
+#     upd || prn "ip6tables. Firewall rules for all open ports might need to be configured."
+#     upd && prn "ip6tables. Configuring firewall rules for all open ports."
+# # tcp
+#     while read PORT; do
+#         ip6tables -nL | grep ${PORT} | grep -q tcp
+#         case $? in
+#             0)  prn "TCP Port ${PORT} is already open in ip6tables." ;;
+#             *)  upd || prn "ip6tables: Port ${PORT} might need to be opened."
+#                 upd && prw "ip6tables: Opening port ${PORT} ."
+#                 case ${PORT} in
+#                     22) upd && ip6tables -A INPUT --source ${INTNETWORK} -p tcp --dport 22 -m state --state NEW -j ACCEPT ;;
+#                     *)  upd && ip6tables -A INPUT -p tcp --dport ${PORT} -m state --state NEW -j ACCEPT ;;
+#                 esac ;;
+#         esac
+#     done < <(netstat -tnlp | grep "^tcp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
+# # udp
+#     while read PORT; do
+#         ip6tables -nL | grep ${PORT} | grep -q udp
+#         case $? in
+#             0)  prn "UDP Port ${PORT} is already open in ip6tables." ;;
+#             *)  upd || prn "ip6tables: Port ${PORT} might need to be opened."
+#                 upd && prw "ip6tables: Opening port ${PORT}."
+#                 upd && ip6tables -A INPUT -p udp --dport ${PORT} -m state --state NEW -j ACCEPT ;;
+#         esac
+#     done < <(netstat -tnlp | grep "^udp " | grep -v 127 | cut -d: -f2 | awk  '{print $1}')
+#     upd && ip6tables -A INPUT -j DROP
+#     upd && iptables-save -c > /etc/iptables.rules
+# )
 
 NO=4.1.1.1;   W=2; S=2; E=; SC=;  BD='Ensure auditd is installed'
 lev && (
@@ -1672,83 +1672,83 @@ lev && (update_conf /etc/sudoers.d/sudoers 'Defaults use_pty')
 NO=5.2.3;     W=1; S=1; E=; SC=;  BD='Ensure sudo log file exists'
 lev && (update_conf /etc/sudoers.d/sudoers 'Defaults logfile="/var/log/sudo.log"')
 
-NO=5.3.1;     W=1; S=1; E=; SC=;  BD='Ensure permissions on /etc/ssh/sshd_config are configured'
-lev && ssd && (update_file /etc/ssh/sshd_config root root 600)
+# NO=5.3.1;     W=1; S=1; E=; SC=;  BD='Ensure permissions on /etc/ssh/sshd_config are configured'
+# lev && ssd && (update_file /etc/ssh/sshd_config root root 600)
 
-NO=5.3.2;     W=1; S=1; E=; SC=;  BD='Ensure permissions on SSH private host key files are configured'
-lev && ssd && (
-    for KEY in /etc/ssh/ssh_host_*_key; do 
-        update_file ${KEY} root root 600
-    done 
-)
+# NO=5.3.2;     W=1; S=1; E=; SC=;  BD='Ensure permissions on SSH private host key files are configured'
+# lev && ssd && (
+#     for KEY in /etc/ssh/ssh_host_*_key; do 
+#         update_file ${KEY} root root 600
+#     done 
+# )
 
-NO=5.3.3;     W=1; S=1; E=; SC=;  BD='Ensure permissions on SSH public host key files are configured'
-lev && ssd && (
-    for KEY in /etc/ssh/ssh_host_*_key.pub; do 
-        update_file ${KEY} root root 644
-    done 
-)
+# NO=5.3.3;     W=1; S=1; E=; SC=;  BD='Ensure permissions on SSH public host key files are configured'
+# lev && ssd && (
+#     for KEY in /etc/ssh/ssh_host_*_key.pub; do 
+#         update_file ${KEY} root root 644
+#     done 
+# )
 
-NO=5.3.4;     W=1; S=1; E=; SC=;  BD='Ensure SSH access is limited'
-lev && ssd && [[ ${SUDOUSR} ]] && (update_conf /etc/ssh/sshd_config 'AllowUsers' "AllowUsers ${SUDOUSR}")
+# NO=5.3.4;     W=1; S=1; E=; SC=;  BD='Ensure SSH access is limited'
+# lev && ssd && [[ ${SUDOUSR} ]] && (update_conf /etc/ssh/sshd_config 'AllowUsers' "AllowUsers ${SUDOUSR}")
 
-NO=5.3.5;     W=1; S=1; E=; SC=;  BD='Ensure SSH LogLevel is appropriate'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'LogLevel' 'LogLevel INFO')
+# NO=5.3.5;     W=1; S=1; E=; SC=;  BD='Ensure SSH LogLevel is appropriate'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'LogLevel' 'LogLevel INFO')
 
-NO=5.3.6;     W=1; S=1; E=; SC=;  BD='Ensure SSH X11 forwarding is disabled'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'X11Forwarding' 'X11Forwarding no')
+# NO=5.3.6;     W=1; S=1; E=; SC=;  BD='Ensure SSH X11 forwarding is disabled'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'X11Forwarding' 'X11Forwarding no')
 
-NO=5.3.7;     W=1; S=1; E=; SC=;  BD='Ensure SSH MaxAuthTries is set to 4 or less'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'MaxAuthTries' 'MaxAuthTries 4')
+# NO=5.3.7;     W=1; S=1; E=; SC=;  BD='Ensure SSH MaxAuthTries is set to 4 or less'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'MaxAuthTries' 'MaxAuthTries 4')
 
-NO=5.3.8;     W=1; S=1; E=; SC=;  BD='Ensure SSH IgnoreRhosts is enabled'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'IgnoreRhosts' 'IgnoreRhosts yes')
+# NO=5.3.8;     W=1; S=1; E=; SC=;  BD='Ensure SSH IgnoreRhosts is enabled'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'IgnoreRhosts' 'IgnoreRhosts yes')
 
-NO=5.3.9;     W=1; S=1; E=; SC=;  BD='Ensure SSH HostbasedAuthentication is disabled'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'HostbasedAuthentication' 'HostbasedAuthentication no')
+# NO=5.3.9;     W=1; S=1; E=; SC=;  BD='Ensure SSH HostbasedAuthentication is disabled'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'HostbasedAuthentication' 'HostbasedAuthentication no')
 
-NO=5.3.10;    W=1; S=1; E=; SC=;  BD='Ensure SSH root login is disabled'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'PermitRootLogin' 'PermitRootLogin no')
+# NO=5.3.10;    W=1; S=1; E=; SC=;  BD='Ensure SSH root login is disabled'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'PermitRootLogin' 'PermitRootLogin no')
 
-NO=5.3.11;    W=1; S=1; E=; SC=;  BD='Ensure SSH PermitEmptyPasswords is disabled'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'PermitEmptyPasswords' 'PermitEmptyPasswords no')
+# NO=5.3.11;    W=1; S=1; E=; SC=;  BD='Ensure SSH PermitEmptyPasswords is disabled'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'PermitEmptyPasswords' 'PermitEmptyPasswords no')
 
-NO=5.3.12;    W=1; S=1; E=; SC=;  BD='Ensure SSH PermitUserEnvironment is disabled'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'PermitUserEnvironment' 'PermitUserEnvironment no')
+# NO=5.3.12;    W=1; S=1; E=; SC=;  BD='Ensure SSH PermitUserEnvironment is disabled'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'PermitUserEnvironment' 'PermitUserEnvironment no')
 
-NO=5.3.13;    W=1; S=1; E=; SC=;  BD='Ensure only strong Ciphers are used'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'Ciphers' 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr')
+# NO=5.3.13;    W=1; S=1; E=; SC=;  BD='Ensure only strong Ciphers are used'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'Ciphers' 'Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr')
 
-NO=5.3.14;    W=1; S=1; E=; SC=;  BD='Ensure only strong MAC algorithms are used'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'MACs' 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256')
+# NO=5.3.14;    W=1; S=1; E=; SC=;  BD='Ensure only strong MAC algorithms are used'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'MACs' 'MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256')
 
-NO=5.3.15;    W=1; S=1; E=; SC=;  BD='Ensure only strong Key Exchange algorithms are used'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'KexAlgorithms' 'KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256') 
+# NO=5.3.15;    W=1; S=1; E=; SC=;  BD='Ensure only strong Key Exchange algorithms are used'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'KexAlgorithms' 'KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256') 
 
-NO=5.3.16;    W=1; S=1; E=; SC=;  BD='Ensure SSH Idle Timeout Interval is configured'
-lev && ssd && (
-    update_conf /etc/ssh/sshd_config "ClientAliveInterval" "ClientAliveInterval ${SSHTMOUT}"
-    update_conf /etc/ssh/sshd_config 'ClientAliveCountMax' "ClientAliveCountMax ${SSHCOMAX}"
-)
+# NO=5.3.16;    W=1; S=1; E=; SC=;  BD='Ensure SSH Idle Timeout Interval is configured'
+# lev && ssd && (
+#     update_conf /etc/ssh/sshd_config "ClientAliveInterval" "ClientAliveInterval ${SSHTMOUT}"
+#     update_conf /etc/ssh/sshd_config 'ClientAliveCountMax' "ClientAliveCountMax ${SSHCOMAX}"
+# )
 
-NO=5.3.17;    W=1; S=1; E=; SC=;  BD='Ensure SSH LoginGraceTime is set to one minute or less'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'LoginGraceTime' 'LoginGraceTime 60')
+# NO=5.3.17;    W=1; S=1; E=; SC=;  BD='Ensure SSH LoginGraceTime is set to one minute or less'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'LoginGraceTime' 'LoginGraceTime 60')
 
 
-NO=5.3.18;    W=1; S=1; E=; SC=;  BD='Ensure SSH warning banner is configured'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'Banner' 'Banner /etc/issue.net')
+# NO=5.3.18;    W=1; S=1; E=; SC=;  BD='Ensure SSH warning banner is configured'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'Banner' 'Banner /etc/issue.net')
 
-NO=5.3.19;    W=1; S=1; E=; SC=;  BD='Ensure SSH PAM is enabled'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'UsePAM' 'UsePAM yes')
+# NO=5.3.19;    W=1; S=1; E=; SC=;  BD='Ensure SSH PAM is enabled'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'UsePAM' 'UsePAM yes')
 
-NO=5.3.20;    W=1; S=1; E=; SC=;  BD='Ensure SSH AllowTcpForwarding is disabled'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'AllowTcpForwarding' 'AllowTcpForwarding no')
+# NO=5.3.20;    W=1; S=1; E=; SC=;  BD='Ensure SSH AllowTcpForwarding is disabled'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'AllowTcpForwarding' 'AllowTcpForwarding no')
 
-NO=5.3.21;    W=1; S=1; E=; SC=;  BD='Ensure SSH MaxStartups is configured'
-lev && ssd && (update_conf /etc/ssh/sshd_config "MaxStartups" "MaxStartups ${SSHMAXST}")
+# NO=5.3.21;    W=1; S=1; E=; SC=;  BD='Ensure SSH MaxStartups is configured'
+# lev && ssd && (update_conf /etc/ssh/sshd_config "MaxStartups" "MaxStartups ${SSHMAXST}")
 
-NO=5.3.22;    W=1; S=1; E=; SC=;  BD='Ensure SSH MaxSessions is is limited'
-lev && ssd && (update_conf /etc/ssh/sshd_config 'MaxSessions' "MaxSessions ${SSHMAXSS}")
+# NO=5.3.22;    W=1; S=1; E=; SC=;  BD='Ensure SSH MaxSessions is is limited'
+# lev && ssd && (update_conf /etc/ssh/sshd_config 'MaxSessions' "MaxSessions ${SSHMAXSS}")
 
 NO=5.4.1;     W=1; S=1; E=; SC=;  BD='Ensure password creation requirements are configured'
 lev && (
